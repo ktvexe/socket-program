@@ -72,7 +72,7 @@ int main()
 			FILE *fp;
 			char create[30] = "What is the name of the file ?";
 			send(clientfd,create,sizeof(create),0);
-        	bzero( buffer1,sizeof(buffer1) );
+        	bzero( create,sizeof(create) );
 			int file=recv(clientfd, create, sizeof(create), 0);
         	if (file < 0){
 				printf("Recieve failed!\n");
@@ -84,6 +84,25 @@ int main()
 				exit(1);
 			}
 			fclose(fp);
+		}
+		else if(*buffer1 =='r'||*buffer1=='R'){
+		//	FILE *fp;
+			char remove_buffer[50] = "which file do you want to delete ?";
+			send(clientfd,remove_buffer,sizeof(remove_buffer),0);
+        	bzero(remove_buffer ,sizeof(remove_buffer) );
+			int file=recv(clientfd,remove_buffer, sizeof(remove_buffer), 0);
+        	if (file < 0){
+				printf("Recieve failed!\n");
+				break;
+			}
+			remove(remove_buffer);
+		/*	fp = fopen(create,"a+");
+			if (fp ==NULL){
+				printf("Open File failed!\n");
+				exit(1);
+			}
+			fclose(fp);
+		*/
 		}
 			
 
