@@ -42,7 +42,7 @@ int main(int argc, char* const argv[])
 	//int len =strlen(argv[1]	);
 	//send(sockfd,message,len,0);
     scanf("%c",choose);
-	printf("Your choice: %s\n",choose);
+	printf("Your choice: %c\n",*choose);
 
 	send(sockfd,choose,sizeof(choose),0);
 	

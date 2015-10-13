@@ -69,11 +69,21 @@ int main()
        // send(clientfd, tmp, sizeof(tmp), 0);
 
 		if(*buffer1 =='c'||*buffer1=='C'){
+			FILE *fp;
 			char create[30] = "What is the name of the file ?";
 			send(clientfd,create,sizeof(create),0);
         	bzero( buffer1,sizeof(buffer1) );
 			int file=recv(clientfd, create, sizeof(create), 0);
-			
+        	if (file < 0){
+				printf("Recieve failed!\n");
+				break;
+			}
+			fp = fopen(create,"a+");
+			if (fp ==NULL){
+				printf("Open File failed!\n");
+				exit(1);
+			}
+			fclose(fp);
 		}
 			
 
