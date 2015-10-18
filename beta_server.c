@@ -1,19 +1,27 @@
+/*
+*socket server v1.0
+*
+*
+*
+*
+*@author LG Liu
+*@link
+*/
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-//#include <strings.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 
-int server(int client);
 
 int main()
 {
-    int sockfd,client_quit;
+    int sockfd;
     struct sockaddr_in dest;
-    char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n############################\nWhich do you want to choose?(C,E,R,L or D)\n";
+    char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n(E)xit\n############################\nWhich do you want to choose?(C,E,R,L or D)\n";
     char buffer1[1024];
     /* create socket */
     if((sockfd = socket(PF_INET, SOCK_STREAM, 0) ) <0 ){
@@ -41,8 +49,8 @@ int main()
 	}
 
     /* infinity loop -- accepting connection from client forever */
-    do
-    {
+    while(1){
+
         int clientfd;
         struct sockaddr_in client_addr;
         int addrlen = sizeof(client_addr);
@@ -104,6 +112,51 @@ int main()
 			fclose(fp);
 		*/
 		}
+		
+		else if (*buffer1=='d'||*buffer1=='D'){
+			char down[60] = " Please key in the file name which you want to download";
+			char file_name[512+1];
+			bzero(file_name, 513);
+			FILE *fp;	
+			send(clientfd,down,sizeof(down),0);
+        	bzero(down ,sizeof(down) );
+			if(recv(clientfd,down, sizeof(down), 0) < 0){
+				printf("Recieve failed!\n");
+				break;
+			}
+			strncpy(file_name,down,strlen(down)>512?512:strlen(down));
+			fp =fopen(file_name,"rb");
+			if (fp == NULL){
+				printf("Can not find the file:%s\n",down);
+			}
+			else{
+				bzero(down,sizeof(down));
+				int file_len =0;
+				while((file_len = fread(down,sizeof(char),60,fp))>0){
+					printf("file_len=%d\n",file_len);
+					
+					if(send(clientfd,down,file_len,0)<0){
+						printf("Send file failed");
+						break;
+					}
+					bzero(down,sizeof(down));
+				}
+			}
+			fclose(fp);
+		}
+
+		else if (*buffer1=='e'||*buffer1=='E'){
+			char quit[30] = " Are you sure to exit ? (Y/N)";
+			send(clientfd,quit,sizeof(quit),0);
+        	bzero(quit ,sizeof(quit) );
+			if(recv(clientfd,quit, sizeof(quit), 0) < 0){
+				printf("Recieve failed!\n");
+				break;
+			}
+			if(*quit == 'y'||*quit =='Y')
+				break;
+			
+		}
 			
 
 
@@ -113,31 +166,12 @@ int main()
 */
 		//write(fd, buffer1, sizeof(buffer1));
         /* close(client) */
-		//client_quit = server(clientfd);
         close(clientfd);
-    }while(!client_quit);
+    }
 
     /* close(server) , but never get here because of the loop */
     close(sockfd);
     return 0;
 
 }
-int server(int client){
-  //   while(1){
-         int length;
-         char* text;
- 
-         //if(read(client, &length ,sizeof(length))==0)
-         //    return 0;
- 
-         text = (char*)malloc (length);
- 
-         read( client,text, length);
-         printf( "%s", text);
-         free( text );
-         if(!strcmp (text,"quit"))
-             return 1;
-		return 0;
-//    }
- }
 

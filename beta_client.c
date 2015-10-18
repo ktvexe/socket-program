@@ -88,6 +88,59 @@ int main(int argc, char* const argv[])
  
     }
 	
+	else if(*choose =='d'||*choose =='D'){
+		char down[60];
+		char file_name[513];
+		FILE* fp;
+		bzero(down,sizeof(down));
+		bzero(file_name,513);
+    	int len =recv(sockfd, down, sizeof(down), 0);
+		if(len < 0){
+			printf("Recieve failed!\n");
+			exit(1);
+		}
+    	printf("%s\n", down);
+        bzero( down,sizeof(down) );
+		scanf("%s",file_name);
+		strncpy(down,file_name,strlen(file_name)>512?512:strlen(file_name));
+        send(sockfd,down,sizeof(down),0);
+		fp = fopen(down,"wb");
+		if(fp == NULL ){
+			printf("Can not open the file\n");
+			exit(1);
+		}
+        bzero( down,sizeof(down) );
+		int down_len =0;
+    	while(down_len =recv(sockfd, down , 60, 0)){
+			if(down_len < 0){
+				printf("Recieve file failed!\n");
+				break;
+			}
+			int write_len = fwrite(down,sizeof(char),down_len,fp);
+		 	if (write_len<down_len){
+            	printf("write file failed\n");
+            	break;
+        	}
+        bzero(down,sizeof(down)); 	
+		}
+		printf("Receive file");
+		fclose(fp);
+	}
+
+	else if(*choose =='e'||*choose =='E'){
+		char quit[30];
+		bzero(quit,30);
+    	int len =recv(sockfd, quit, sizeof(quit), 0);
+		if(len < 0){
+			printf("Recieve failed!\n");
+			exit(1);
+		}
+    	printf("%s\n", quit);
+        bzero( quit,sizeof(quit) );
+		scanf("%s",quit);
+        send(sockfd,quit,sizeof(quit),0);
+        bzero( quit,sizeof(quit) );
+	}
 	//bzero(message,strlen(message));
 	/* Close connection */
 	
