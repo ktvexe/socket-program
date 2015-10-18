@@ -87,7 +87,31 @@ int main(int argc, char* const argv[])
      //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
  
     }
+
+
+	else if(*choose =='l'||*choose =='L'){
+		char list[30];
+		bzero(list,30);
+		while(1){
+    		int len =recv(sockfd, list, sizeof(list), 0);
+			if(len < 0){
+				printf("Recieve failed!\n");
+				exit(1);
+			}
+			int cmp =strcmp(list,":end");
+			if(cmp == 0){
+				break;
+			}
+    		printf("%s\n", list);
+        	bzero( list,sizeof(list) );
+		}
+		//scanf("%s",quit);
+        //send(sockfd,quit,sizeof(quit),0);
+        //bzero( quit,sizeof(quit) );
+	}
 	
+
+
 	else if(*choose =='d'||*choose =='D'){
 		char down[60];
 		FILE* fp;

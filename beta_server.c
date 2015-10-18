@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <dirent.h>
 
 
 int main()
@@ -112,7 +112,27 @@ int main()
 			fclose(fp);
 		*/
 		}
+
+
+		else if (*buffer1=='l'||*buffer1=='L'){
+			char list[30] = "These are document of server:\n";
+			DIR* dir;
+			struct dirent* ptr;
+			dir = opendir(".");
+			send(clientfd,list,sizeof(list),0);
+        	bzero(list ,sizeof(list) );
+			while((ptr =readdir(dir)) != NULL){
+				strcpy(list,ptr->d_name);
+				send(clientfd,list,sizeof(list),0);
+			}
+			close(dir);
+			strcpy(list,":end");
+			send(clientfd,list,sizeof(list),0);
+        	bzero(list ,sizeof(list) );
+		}
 		
+
+
 		else if (*buffer1=='d'||*buffer1=='D'){
 			char down[60] = " Please key in the file name which you want to download";
 			FILE *fp;	
