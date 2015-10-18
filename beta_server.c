@@ -115,8 +115,6 @@ int main()
 		
 		else if (*buffer1=='d'||*buffer1=='D'){
 			char down[60] = " Please key in the file name which you want to download";
-			char file_name[512+1];
-			bzero(file_name, 513);
 			FILE *fp;	
 			send(clientfd,down,sizeof(down),0);
         	bzero(down ,sizeof(down) );
@@ -124,8 +122,7 @@ int main()
 				printf("Recieve failed!\n");
 				break;
 			}
-			strncpy(file_name,down,strlen(down)>512?512:strlen(down));
-			fp =fopen(file_name,"rb");
+			fp =fopen(down,"rb");
 			if (fp == NULL){
 				printf("Can not find the file:%s\n",down);
 			}

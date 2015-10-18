@@ -90,10 +90,8 @@ int main(int argc, char* const argv[])
 	
 	else if(*choose =='d'||*choose =='D'){
 		char down[60];
-		char file_name[513];
 		FILE* fp;
 		bzero(down,sizeof(down));
-		bzero(file_name,513);
     	int len =recv(sockfd, down, sizeof(down), 0);
 		if(len < 0){
 			printf("Recieve failed!\n");
@@ -101,8 +99,7 @@ int main(int argc, char* const argv[])
 		}
     	printf("%s\n", down);
         bzero( down,sizeof(down) );
-		scanf("%s",file_name);
-		strncpy(down,file_name,strlen(file_name)>512?512:strlen(file_name));
+		scanf("%s",down);
         send(sockfd,down,sizeof(down),0);
 		fp = fopen(down,"wb");
 		if(fp == NULL ){
