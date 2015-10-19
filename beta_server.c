@@ -86,13 +86,72 @@ int main()
 				printf("Recieve failed!\n");
 				break;
 			}
-			fp = fopen(create,"a+");
+			fp = fopen(create,"w");
 			if (fp ==NULL){
 				printf("Open File failed!\n");
 				exit(1);
 			}
 			fclose(fp);
 		}
+
+
+		else if (*buffer1=='e'||*buffer1=='E'){
+			char edit[128] = "please key in the file name which you want to edit:\n";
+			FILE* fpr,*fpa;
+			send(clientfd,edit,sizeof(edit),0);
+        	bzero(edit ,sizeof(edit) );
+			int file=recv(clientfd, edit, sizeof(edit), 0);
+        	if (file < 0){
+				printf("Recieve failed!\n");
+				break;
+			}
+			fpr = fopen(edit,"r+");
+			if(fpr ==NULL){
+        		bzero(edit ,sizeof(edit) );
+				printf("file does not exit\n");
+				strcpy(edit,"file does not exit");
+				send(clientfd,edit,sizeof(edit),0);
+				break;
+			}
+			fclose(fpr);
+			fpa =fopen(edit ,"a");
+        	bzero(edit ,sizeof(edit) );
+			strcpy(edit,"Please key in what you want to append to the file\nIf you work done,please key in :end to finish it");
+			send(clientfd,edit,sizeof(edit),0);
+        	bzero(edit ,sizeof(edit) );
+			int edit_len =0;
+			//while(1){
+			while(edit_len = recv(clientfd ,edit,sizeof(edit),0)){
+				//edit_len = recv(clientfd ,edit,sizeof(edit),0);
+				if (edit_len < 0){
+        			bzero(edit ,sizeof(edit) );
+					printf("Write file failed\n");
+					strcpy(edit,"Write file failed\n");
+					send(clientfd,edit,sizeof(edit),0);
+					break;
+				}
+				printf("receive:%d",edit_len);
+				int cmp = strcmp(edit,":end");
+				if(cmp ==0){
+					break;
+				}
+				fprintf(fpa,"%s",edit);
+				/*
+				int write_len = fwrite(edit,sizeof(char),edit_len,fp);
+				if(write_len < edit_len){
+        			bzero(edit ,sizeof(edit) );
+					strcpy(edit,"Write file failed\n");
+					send(clientfd,edit,sizeof(edit),0);
+					break;
+				}
+				*/
+				bzero(edit,sizeof(edit));
+			}
+			printf("edit done\n");
+			fclose(fpa);
+		}
+
+
 		else if(*buffer1 =='r'||*buffer1=='R'){
 		//	FILE *fp;
 			char remove_buffer[50] = "which file do you want to delete ?";

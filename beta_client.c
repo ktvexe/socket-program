@@ -69,6 +69,42 @@ int main(int argc, char* const argv[])
      //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
  
     }
+	
+	else if(*choose =='e'||*choose=='E'){
+        char edit[128] ;
+		FILE* fp;
+		bzero(edit,sizeof(edit));
+    	int len =recv(sockfd, edit, sizeof(edit), 0);
+		if(len < 0){
+			printf("Recieve failed!\n");
+			exit(1);
+		}
+    	printf("%s\n", edit);
+        bzero( edit,sizeof(edit) );
+		scanf("%s",edit);
+		printf("The file name is: %s\n",edit);
+        send(sockfd,edit,sizeof(edit),0);
+        bzero( edit,sizeof(edit) );
+    	len =recv(sockfd, edit, sizeof(edit), 0);
+		if(len < 0){
+			printf("Recieve failed!\n");
+			exit(1);
+		}
+    	printf("%s\n", edit);
+		while(1){
+			scanf("%s",edit);
+        	send(sockfd,edit,sizeof(edit),0);
+			int cmp =strcmp(edit,":end");
+			if(cmp == 0){
+				break;
+			}
+        	bzero( edit,sizeof(edit) );
+			printf("time");
+		}
+    	printf("Edit done\n");
+     //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
+ 
+    }
 
 	else if(*choose =='r'||*choose=='R'){
         char remove_buffer[50] ;
@@ -142,7 +178,7 @@ int main(int argc, char* const argv[])
             	printf("write file failed\n");
             	break;
         	}
-        bzero(down,sizeof(down)); 	
+        	bzero(down,sizeof(down)); 	
 		}
 		printf("Receive file");
 		fclose(fp);
