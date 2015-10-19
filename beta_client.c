@@ -45,8 +45,6 @@ int main(int argc, char* const argv[])
     recv(sockfd, buffer, sizeof(buffer), 0);
     printf("%s", buffer);
     
-	//int len =strlen(argv[1]	);
-	//send(sockfd,message,len,0);
     scanf("%c",choose);
 	printf("Your choice: %c\n",*choose);
 
@@ -104,11 +102,8 @@ int main(int argc, char* const argv[])
 				break;
 			}
         	bzero( edit,sizeof(edit) );
-			printf("time");
 		}
     	printf("Edit done\n");
-     //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
- 
     }
 
 
@@ -127,7 +122,6 @@ int main(int argc, char* const argv[])
 		printf("The file name is: %s\n",remove_buffer);
         send(sockfd,remove_buffer,sizeof(remove_buffer),0);
         bzero( remove_buffer,sizeof(remove_buffer) );
-     //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
  
     }
 
@@ -148,9 +142,6 @@ int main(int argc, char* const argv[])
     		printf("%s\n", list);
         	bzero( list,sizeof(list) );
 		}
-		//scanf("%s",quit);
-        //send(sockfd,quit,sizeof(quit),0);
-        //bzero( quit,sizeof(quit) );
 	}
 	
 

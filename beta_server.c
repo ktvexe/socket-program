@@ -20,24 +20,24 @@
 int main()
 {
     int sockfd;
-    struct sockaddr_in dest;
+    struct sockaddr_in server_name;
     char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n(Q)uit\n############################\nWhich do you want to choose?(C,E,R,L,D or Q)\n";
-    char buffer1[1024];
+    char buffer1[1];
     /* create socket */
     if((sockfd = socket(PF_INET, SOCK_STREAM, 0) ) <0 ){
 		printf("Create socket failed!\n");
 		exit(1);
 	}
 
-    /* initialize structure dest */
-    bzero(&dest, sizeof(dest));
-    dest.sin_family = AF_INET;
-    dest.sin_port = htons(3000);
+    /* initialize structure sockaddr_in */
+    bzero(&server_name, sizeof(server_name));
+    server_name.sin_family = AF_INET;
+    server_name.sin_port = htons(3000);
     /* this line is different from client */
-    dest.sin_addr.s_addr = htons(INADDR_ANY);
+    server_name.sin_addr.s_addr = htons(INADDR_ANY);
 
     /* Assign a port number to socket */
-    if(bind(sockfd, (struct sockaddr*)&dest, sizeof(dest)) ){
+    if(bind(sockfd, (struct sockaddr*)&server_name, sizeof(server_name)) ){
 		printf("Server Bind Port failed!\n");
 		exit(1);
 	}
@@ -63,7 +63,8 @@ int main()
 			break;
 		}
 		printf("Connect...\n");
-        /* Send message */
+
+		/* Send message */
         send(clientfd, buffer, sizeof(buffer), 0);
         bzero( buffer1,sizeof(buffer1) );
 		int res=recv(clientfd, buffer1, sizeof(buffer1), 0);
@@ -71,11 +72,8 @@ int main()
 			printf("Recieve failed!\n");
 			break;
 		}
-		//client_quit = server(clientfd);
-		//printf("receive from client: %s, %d bytes\n", buffer1,res);
-       // bzero( tmp,sizeof(tmp) );
-		//strcpy(tmp ,"Your choice :");
-       // send(clientfd, tmp, sizeof(tmp), 0);
+
+
 
 		if(*buffer1 =='c'||*buffer1=='C'){
 			FILE *fp;
@@ -98,6 +96,7 @@ int main()
 
 		else if (*buffer1=='e'||*buffer1=='E'){
 			char edit[128] = "please key in the file name which you want to edit:\n";
+			char file_name[64];
 			FILE* fpr,*fpa;
 			send(clientfd,edit,sizeof(edit),0);
         	bzero(edit ,sizeof(edit) );
@@ -115,15 +114,14 @@ int main()
 				break;
 			}
 			fclose(fpr);
-			fpa =fopen(edit ,"a");
+			strcpy(file_name,edit);
+			fpa =fopen(edit ,"a+");
         	bzero(edit ,sizeof(edit) );
 			strcpy(edit,"Please key in what you want to append to the file\nIf you work done,please key in :end to finish it");
 			send(clientfd,edit,sizeof(edit),0);
         	bzero(edit ,sizeof(edit) );
 			int edit_len =0;
-			//while(1){
 			while(edit_len = recv(clientfd ,edit,sizeof(edit),0)){
-				//edit_len = recv(clientfd ,edit,sizeof(edit),0);
 				if (edit_len < 0){
         			bzero(edit ,sizeof(edit) );
 					printf("Write file failed\n");
@@ -131,30 +129,20 @@ int main()
 					send(clientfd,edit,sizeof(edit),0);
 					break;
 				}
-				printf("receive:%d",edit_len);
 				int cmp = strcmp(edit,":end");
 				if(cmp ==0){
 					break;
 				}
-				fprintf(fpa,"%s",edit);
-				/*
-				int write_len = fwrite(edit,sizeof(char),edit_len,fp);
-				if(write_len < edit_len){
-        			bzero(edit ,sizeof(edit) );
-					strcpy(edit,"Write file failed\n");
-					send(clientfd,edit,sizeof(edit),0);
-					break;
-				}
-				*/
+				fprintf(fpa,"%s\n",edit);
 				bzero(edit,sizeof(edit));
+			
 			}
-			printf("edit done\n");
 			fclose(fpa);
+			printf("edit done\n");
 		}
 
 
 		else if(*buffer1 =='r'||*buffer1=='R'){
-		//	FILE *fp;
 			char remove_buffer[50] = "which file do you want to delete ?";
 			send(clientfd,remove_buffer,sizeof(remove_buffer),0);
         	bzero(remove_buffer ,sizeof(remove_buffer) );
@@ -164,13 +152,6 @@ int main()
 				break;
 			}
 			remove(remove_buffer);
-		/*	fp = fopen(create,"a+");
-			if (fp ==NULL){
-				printf("Open File failed!\n");
-				exit(1);
-			}
-			fclose(fp);
-		*/
 		}
 
 
@@ -235,19 +216,9 @@ int main()
 				break;
 			}
 		}
-			
-
-
-/*        switch(buffer1){
-			case
-		}
-*/
-		//write(fd, buffer1, sizeof(buffer1));
-        /* close(client) */
         close(clientfd);
     }
 
-    /* close(server) , but never get here because of the loop */
     close(sockfd);
     return 0;
 
