@@ -1,4 +1,13 @@
-#include <sys/types.h>          /* See NOTES */
+/*
+*socket client v1.0
+*
+*
+*
+*
+*@author LG Liu
+*@link https://github.com/ktvexe/socket-program
+*/
+#include <sys/types.h>          
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
@@ -34,7 +43,7 @@ int main(int argc, char* const argv[])
     /* Receive message from the server and print to screen */
     bzero(buffer, 1024);
     recv(sockfd, buffer, sizeof(buffer), 0);
-    printf("%s\n", buffer);
+    printf("%s", buffer);
     
 	//int len =strlen(argv[1]	);
 	//send(sockfd,message,len,0);
@@ -43,14 +52,6 @@ int main(int argc, char* const argv[])
 
 	send(sockfd,choose,sizeof(choose),0);
 	
-//    bzero(buffer, 1024);
-   /*
-   	int len=recv(sockfd, buffer, sizeof(buffer), 0);
-    if(len < 0){
-		printf("Recieve failed!\n");
-		break;
-	}
-	*/
 	
 	if(*choose =='c'||*choose=='C'){
         char create[30] ;
@@ -66,7 +67,6 @@ int main(int argc, char* const argv[])
 		printf("The file name is: %s\n",create);
         send(sockfd,create,sizeof(create),0);
         bzero( create,sizeof(create) );
-     //   int file=recv(clientfd, buffer1, sizeof(buffer1), 0);
  
     }
 	
@@ -79,7 +79,7 @@ int main(int argc, char* const argv[])
 			printf("Recieve failed!\n");
 			exit(1);
 		}
-    	printf("%s\n", edit);
+    	printf("%s", edit);
         bzero( edit,sizeof(edit) );
 		scanf("%s",edit);
 		printf("The file name is: %s\n",edit);
@@ -88,6 +88,11 @@ int main(int argc, char* const argv[])
     	len =recv(sockfd, edit, sizeof(edit), 0);
 		if(len < 0){
 			printf("Recieve failed!\n");
+			exit(1);
+		}
+		int no_file =strcmp(edit,":end_no_file");
+		if(no_file == 0){
+			printf("file does no exist\n");
 			exit(1);
 		}
     	printf("%s\n", edit);
@@ -106,6 +111,8 @@ int main(int argc, char* const argv[])
  
     }
 
+
+
 	else if(*choose =='r'||*choose=='R'){
         char remove_buffer[50] ;
 		bzero(remove_buffer,50);
@@ -114,7 +121,7 @@ int main(int argc, char* const argv[])
 			printf("Recieve failed!\n");
 			exit(1);
 		}
-    	printf("%s\n", remove_buffer);
+    	printf("%s", remove_buffer);
         bzero( remove_buffer,sizeof(remove_buffer) );
 		scanf("%s",remove_buffer);
 		printf("The file name is: %s\n",remove_buffer);
@@ -184,7 +191,7 @@ int main(int argc, char* const argv[])
 		fclose(fp);
 	}
 
-	else if(*choose =='e'||*choose =='E'){
+	else if(*choose =='q'||*choose =='Q'){
 		char quit[30];
 		bzero(quit,30);
     	int len =recv(sockfd, quit, sizeof(quit), 0);
@@ -198,7 +205,6 @@ int main(int argc, char* const argv[])
         send(sockfd,quit,sizeof(quit),0);
         bzero( quit,sizeof(quit) );
 	}
-	//bzero(message,strlen(message));
 	/* Close connection */
 	
 	

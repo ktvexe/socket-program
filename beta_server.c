@@ -5,7 +5,7 @@
 *
 *
 *@author LG Liu
-*@link
+*@link https://github.com/ktvexe/socket-program
 */
 
 #include <sys/types.h>
@@ -21,7 +21,7 @@ int main()
 {
     int sockfd;
     struct sockaddr_in dest;
-    char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n(E)xit\n############################\nWhich do you want to choose?(C,E,R,L or D)\n";
+    char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n(Q)uit\n############################\nWhich do you want to choose?(C,E,R,L,D or Q)\n";
     char buffer1[1024];
     /* create socket */
     if((sockfd = socket(PF_INET, SOCK_STREAM, 0) ) <0 ){
@@ -47,7 +47,7 @@ int main()
 		printf("Server Listen failed!\n");
 		exit(1);
 	}
-
+	printf("**********SOCKET SERVER**********\n");	
     /* infinity loop -- accepting connection from client forever */
     while(1){
 
@@ -62,6 +62,7 @@ int main()
 			printf("Server Accept failed!\n");
 			break;
 		}
+		printf("Connect...\n");
         /* Send message */
         send(clientfd, buffer, sizeof(buffer), 0);
         bzero( buffer1,sizeof(buffer1) );
@@ -71,7 +72,7 @@ int main()
 			break;
 		}
 		//client_quit = server(clientfd);
-		printf("receive from client: %s, %d bytes\n", buffer1,res);
+		//printf("receive from client: %s, %d bytes\n", buffer1,res);
        // bzero( tmp,sizeof(tmp) );
 		//strcpy(tmp ,"Your choice :");
        // send(clientfd, tmp, sizeof(tmp), 0);
@@ -109,7 +110,7 @@ int main()
 			if(fpr ==NULL){
         		bzero(edit ,sizeof(edit) );
 				printf("file does not exit\n");
-				strcpy(edit,"file does not exit");
+				strcpy(edit,":end_no_file");
 				send(clientfd,edit,sizeof(edit),0);
 				break;
 			}
@@ -221,17 +222,18 @@ int main()
 			fclose(fp);
 		}
 
-		else if (*buffer1=='e'||*buffer1=='E'){
-			char quit[30] = " Are you sure to exit ? (Y/N)";
+		else if (*buffer1=='q'||*buffer1=='Q'){
+			char quit[30] = "Are you sure to quit ? (Y/N)";
 			send(clientfd,quit,sizeof(quit),0);
         	bzero(quit ,sizeof(quit) );
 			if(recv(clientfd,quit, sizeof(quit), 0) < 0){
 				printf("Recieve failed!\n");
 				break;
 			}
-			if(*quit == 'y'||*quit =='Y')
+			if(*quit == 'y'||*quit =='Y'){
+				printf("Close server\n");
 				break;
-			
+			}
 		}
 			
 
