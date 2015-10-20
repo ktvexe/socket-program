@@ -55,7 +55,7 @@ int main()
         struct sockaddr_in client_addr;
         int addrlen = sizeof(client_addr);
 		char tmp[30];
-
+		printf("Waiting...\n");
         /* Wait and Accept connection */
 		accept_connect( &clientfd, &sockfd, &client_addr, &addrlen);
 		printf("Connect...\n");
