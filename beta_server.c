@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <dirent.h>
 
+void create_socket(int* );
+void setting_sockaddr_in(struct sockaddr_in* );
+void assign_port(int* ,struct sockaddr_in* );
+void listen_to_client(int* );
 
 int main()
 {
@@ -23,32 +27,22 @@ int main()
     struct sockaddr_in server_name;
     char buffer[1024] = "############################\nWelcom to Internet editer\n############################\nThere are some option you can choose below:\n############################\n(C)reate\n(E)dit\n(R)emove\n(L)ist\n(D)ownload\n(Q)uit\n############################\nWhich do you want to choose?(C,E,R,L,D or Q)\n";
     char buffer1[1];
-    /* create socket */
-    if((sockfd = socket(PF_INET, SOCK_STREAM, 0) ) <0 ){
-		printf("Create socket failed!\n");
-		exit(1);
-	}
+    
+	/* create socket */
+	create_socket(&sockfd);
 
-    /* initialize structure sockaddr_in */
-    bzero(&server_name, sizeof(server_name));
-    server_name.sin_family = AF_INET;
-    server_name.sin_port = htons(3000);
-    /* this line is different from client */
-    server_name.sin_addr.s_addr = htons(INADDR_ANY);
+	/* initialize structure sockaddr_in */
+    setting_sockaddr_in(&server_name );
 
     /* Assign a port number to socket */
-    if(bind(sockfd, (struct sockaddr*)&server_name, sizeof(server_name)) ){
-		printf("Server Bind Port failed!\n");
-		exit(1);
-	}
+	assign_port(&sockfd ,&server_name );
 
     /* make it listen to socket with max 20 connections */
-    if( listen(sockfd, 20) ){
-		printf("Server Listen failed!\n");
-		exit(1);
-	}
+	listen_to_client(&sockfd );
+
 	printf("**********SOCKET SERVER**********\n");	
-    /* infinity loop -- accepting connection from client forever */
+    
+	/* infinity loop -- accepting connection from client forever */
     while(1){
 
         int clientfd;
@@ -156,7 +150,7 @@ int main()
 
 
 		else if (*buffer1=='l'||*buffer1=='L'){
-			char list[30] = "These are document of server:\n";
+			char list[30] = "These are document of server:";
 			DIR* dir;
 			struct dirent* ptr;
 			dir = opendir(".");
@@ -224,3 +218,41 @@ int main()
 
 }
 
+
+
+
+void create_socket(int* sockfd){
+
+    if((*sockfd = socket(PF_INET, SOCK_STREAM, 0) ) <0 ){
+		printf("Create socket failed!\n");
+		exit(1);
+	}
+}
+
+
+void setting_sockaddr_in(struct sockaddr_in* server_name){
+
+	bzero(server_name, sizeof(*server_name));
+    server_name->sin_family = AF_INET;
+    server_name->sin_port = htons(3000);
+    /* this line is different from client */
+    server_name->sin_addr.s_addr = htons(INADDR_ANY);
+}
+
+
+void assign_port(int* sockfd,struct sockaddr_in* server_name){
+
+    if(bind(*sockfd, (struct sockaddr*)server_name, sizeof(*server_name)) ){
+		printf("Server Bind Port failed!\n");
+		exit(1);
+	}
+}
+
+
+void listen_to_client(int* sockfd){
+
+    if( listen(*sockfd, 20) ){
+		printf("Server Listen failed!\n");
+		exit(1);
+	}
+}
