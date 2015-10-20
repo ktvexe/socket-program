@@ -61,7 +61,6 @@ int main()
 		printf("Connect...\n");
 
 		/* Send message */
-//		send_message(clientfd,buffer,sizeof(buffer));
         send(clientfd, buffer, sizeof(buffer), 0);
         bzero( buffer1,sizeof(buffer1) );
 		
@@ -126,11 +125,7 @@ void accept_connect(int* clientfd,int* sockfd,struct sockaddr_in* client_addr,in
 
 
 int handle_receive_choice(int* clientfd,char* buffer1){
-	int res=recv(*clientfd, buffer1, sizeof(buffer1), 0);
-    if(res < 0){
-		printf("Recieve failed!\n");
-		exit(1);
-	}
+	receive_message(*clientfd,buffer1,sizeof(buffer1));
 	if(*buffer1 =='c'||*buffer1=='C'){
 		return 1;
 	}
@@ -160,13 +155,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 			FILE *fp;
 			char create[30] = "What is the name of the file ?";
 			send_message(clientfd,create,sizeof(create));
-//			send(clientfd,create,sizeof(create),0);
- //       	bzero( create,sizeof(create) );
-			int file=recv(clientfd, create, sizeof(create), 0);
-        	if (file < 0){
-				printf("Recieve failed!\n");
-				exit(1);
-			}
+			receive_message(clientfd,create,sizeof(create));
 			fp = fopen(create,"w");
 			if (fp ==NULL){
 				printf("Open File failed!\n");
@@ -181,13 +170,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 			char file_name[64];
 			FILE* fpr,*fpa;
 			send_message(clientfd,edit,sizeof(edit));
-//			send(clientfd,edit,sizeof(edit),0);
-  //      	bzero(edit ,sizeof(edit) );
-			int file=recv(clientfd, edit, sizeof(edit), 0);
-        	if (file < 0){
-				printf("Recieve failed!\n");
-				exit(1);
-			}
+			receive_message(clientfd,edit,sizeof(edit));
 			fpr = fopen(edit,"r+");
 			if(fpr ==NULL){
         		bzero(edit ,sizeof(edit) );
@@ -202,8 +185,6 @@ void switch_function(int choice_case ,int clientfd,int* end){
         	bzero(edit ,sizeof(edit) );
 			strcpy(edit,"Please key in what you want to append to the file\nIf you work done,please key in :end to finish it");
 			send_message(clientfd,edit,sizeof(edit));
-//			send(clientfd,edit,sizeof(edit),0);
- //       	bzero(edit ,sizeof(edit) );
 			int edit_len =0;
 			while(edit_len = recv(clientfd ,edit,sizeof(edit),0)){
 				if (edit_len < 0){
@@ -230,13 +211,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 		case 3:{
 			char remove_buffer[50] = "which file do you want to delete ?";
 			send_message(clientfd,remove_buffer,sizeof(remove_buffer));
-//			send(clientfd,remove_buffer,sizeof(remove_buffer),0);
- //       	bzero(remove_buffer ,sizeof(remove_buffer) );
-			int file=recv(clientfd,remove_buffer, sizeof(remove_buffer), 0);
-        	if (file < 0){
-				printf("Recieve failed!\n");
-				exit(1);
-			}
+			receive_message(clientfd,remove_buffer,sizeof(remove_buffer));
 			remove(remove_buffer);
 
 			break;
@@ -248,21 +223,16 @@ void switch_function(int choice_case ,int clientfd,int* end){
 			struct dirent* ptr;
 			dir = opendir(".");
 			send_message(clientfd,list,sizeof(list));
-//			send(clientfd,list,sizeof(list),0);
-//        	bzero(list ,sizeof(list) );
 			while((ptr =readdir(dir)) != NULL){
         		bzero(list ,sizeof(list) );
 				strcpy(list,ptr->d_name);
 				if(strcmp(list,".") && strcmp(list,"..")){
 					send_message(clientfd,list,sizeof(list));
-//					send(clientfd,list,sizeof(list),0);
 				}
 			}
 			close(dir);
 			strcpy(list,":end");
 			send_message(clientfd,list,sizeof(list));
-//			send(clientfd,list,sizeof(list),0);
-//        	bzero(list ,sizeof(list) );
 
 			break;
 		}
@@ -271,12 +241,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 			char down[60] = " Please key in the file name which you want to download";
 			FILE *fp;	
 			send_message(clientfd,down,sizeof(down));
-//			send(clientfd,down,sizeof(down),0);
- //       	bzero(down ,sizeof(down) );
-			if(recv(clientfd,down, sizeof(down), 0) < 0){
-				printf("Recieve failed!\n");
-				exit(1);
-			}
+			receive_message(clientfd,down,sizeof(down));
 			fp =fopen(down,"rb");
 			if (fp == NULL){
 				printf("Can not find the file:%s\n",down);
@@ -285,8 +250,6 @@ void switch_function(int choice_case ,int clientfd,int* end){
 				bzero(down,sizeof(down));
 				int file_len =0;
 				while((file_len = fread(down,sizeof(char),60,fp))>0){
-					//printf("file_len=%d\n",file_len);
-					
 					if(send(clientfd,down,file_len,0)<0){
 						printf("Send file failed");
 						exit(1);
@@ -302,12 +265,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 		case 6:{
 			char quit[30] = "Are you sure to quit ? (Y/N)";
 			send_message(clientfd,quit,sizeof(quit));
-//			send(clientfd,quit,sizeof(quit),0);
-  //      	bzero(quit ,sizeof(quit) );
-			if(recv(clientfd,quit, sizeof(quit), 0) < 0){
-				printf("Recieve failed!\n");
-				exit(1);
-			}
+			receive_message(clientfd,quit,sizeof(quit));
 			if(*quit == 'y'||*quit =='Y'){
 				printf("Close server\n");
 				*end = 1;
@@ -330,5 +288,10 @@ void send_message(int fd,char* buf,int size){
 
 
 void receive_message(int fd,char buf[],int size){
+	int res=recv(fd, buf, size, 0);
+    if(res < 0){
+		printf("Recieve failed!\n");
+		exit(1);
+	}
 
 }
