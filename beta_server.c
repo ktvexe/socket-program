@@ -49,7 +49,6 @@ int main()
 	printf("**********SOCKET SERVER**********\n");	
     
 	/* infinity loop -- accepting connection from client forever */
-    do{
 
         int clientfd;
         struct sockaddr_in client_addr;
@@ -64,14 +63,15 @@ int main()
         send(clientfd, buffer, sizeof(buffer), 0);
         bzero( buffer1,sizeof(buffer1) );
 		
+    do{
 		/*receive function choice*/
 		int choice_case = handle_receive_choice(&clientfd,buffer1 );	
 		switch_function(choice_case ,clientfd, &end);
 		
 		//printf("case:%d",choice_case);
 
-  		close(clientfd);
     }while(!end);
+  		close(clientfd);
 
     close(sockfd);
     return 0;
@@ -144,8 +144,9 @@ int handle_receive_choice(int* clientfd,char* buffer1){
 	else if(*buffer1 =='q'||*buffer1=='Q'){
 		return 6;
 	}
-	else
+	else{
 		return -1;
+	}
 }
 
 
@@ -194,11 +195,12 @@ void switch_function(int choice_case ,int clientfd,int* end){
 					send(clientfd,edit,sizeof(edit),0);
 					exit(1);
 				}
-				int cmp = strcmp(edit,":end");
+				int cmp = strcmp(edit,":end\n");
 				if(cmp ==0){
 					break;
 				}
-				fprintf(fpa,"%s\n",edit);
+				//fprintf(fpa,"%s",edit);
+				fputs(edit,fpa);
 				bzero(edit,sizeof(edit));
 			
 			}
@@ -250,6 +252,7 @@ void switch_function(int choice_case ,int clientfd,int* end){
 				bzero(down,sizeof(down));
 				int file_len =0;
 				while((file_len = fread(down,sizeof(char),60,fp))>0){
+			//	while(!feof(fp)){
 					if(send(clientfd,down,file_len,0)<0){
 						printf("Send file failed");
 						exit(1);

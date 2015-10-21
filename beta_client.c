@@ -18,12 +18,13 @@ void setting_sockaddr_in(struct sockaddr_in* client_name);
 void connect_to_server(int sockfd, struct sockaddr_in);
 void send_message(int fd,char buf[],int size);
 void receive_message(int fd,char buf[],int size);
-void switch_function(char* buf,int fd);
+void switch_function(char* buf,int fd,int* end);
 
 int main(int argc, char* const argv[])
 {
     int sockfd;
-	int end;
+	int ch;
+	int end = 0;
     struct sockaddr_in client_name;
 	char buffer[1024];
 	char choose[1];
@@ -37,18 +38,23 @@ int main(int argc, char* const argv[])
 	//client don't have to bind,because which port client use is not important
 	/* Connecting to server */
 	connect_to_server(sockfd, client_name);
-
 	/* Receive message from the server and print to screen */
     bzero(buffer, 1024);
 	receive_message(sockfd,buffer,sizeof(buffer));
+	do{
     printf("%s", buffer);
-    
     scanf("%c",choose);
 	printf("Your choice: %c\n",*choose);
 
 	send(sockfd,choose,sizeof(choose),0);
 	
-	switch_function(choose,sockfd);
+	switch_function(choose,sockfd,&end);
+//	bzero(choose,1);
+	printf("\n");
+	if(!(*choose =='e'||*choose =='E'))
+		while ((ch = getchar()) != EOF && ch != '\n'); 
+		//getc(stdin);
+	}while(!end);
 	/* Close connection */
 	close(sockfd);
 	return 0;
@@ -96,7 +102,7 @@ void receive_message(int fd,char buf[],int size){
 }
 
 
-void switch_function(char* choose,int sockfd){
+void switch_function(char* choose,int sockfd,int *end){
 	if(*choose =='c'||*choose=='C'){
         char create[30] ;
 		bzero(create,30);
@@ -125,10 +131,13 @@ void switch_function(char* choose,int sockfd){
 			exit(1);
 		}
     	printf("%s\n", edit);
+	//	fgetc(stdin);
 		while(1){
-			scanf("%s",edit);
+			//scanf("%s",edit);
+			//scanf("%[^\n]",edit);
+			fgets(edit,sizeof(edit),stdin);
         	send(sockfd,edit,sizeof(edit),0);
-			int cmp =strcmp(edit,":end");
+			int cmp =strcmp(edit,":end\n");
 			if(cmp == 0){
 				break;
 			}
@@ -172,6 +181,7 @@ void switch_function(char* choose,int sockfd){
 		receive_message(sockfd,down,sizeof(down));
     	printf("%s\n", down);
         bzero( down,sizeof(down) );
+	//	fgets(down,sizeof(down),stdin);
 		scanf("%s",down);
         send(sockfd,down,sizeof(down),0);
 		fp = fopen(down,"wb");
@@ -205,6 +215,8 @@ void switch_function(char* choose,int sockfd){
         bzero( quit,sizeof(quit) );
 		scanf("%s",quit);
 		send_message(sockfd,quit,sizeof(quit));
+		*end = 1;
 	}
-
+	else
+		printf("Input incorrect\n");
 }
