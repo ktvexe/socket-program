@@ -1,0 +1,12 @@
+This editor has basic six functions
+Create :Key in "c" and then key in file name you want to create.
+		the file will be created on server
+Edit :Key in "e",and then key in file name you want to edit. 
+	  next, key in content. If you want to finish it,
+	  please key in ":end"
+Remove :Key in "r" and then key in file name you want to remove.
+	    the file will be removed on server
+List :key in "l" and it will show you document of server
+Download :Key in "d" and then key in file name you want to download
+		  the file will be downloaded to client
+Quit :Key in "q",and then key in "y" to exit system
